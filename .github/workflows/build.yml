@@ -1,0 +1,38 @@
+
+name: Build Micro Radar
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download source
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install PlatformIO
+        run: pip install platformio
+
+      - name: Compile ESP32-C3 firmware
+        run: pio run -e esp32-c3-devkitm-1
+
+      - name: Upload firmware files
+        uses: actions/upload-artifact@v4
+        with:
+          name: micro-radar-esp32-c3
+          path: |
+            .pio/build/esp32-c3-devkitm-1/firmware.bin
+            .pio/build/esp32-c3-devkitm-1/bootloader.bin
+            .pio/build/esp32-c3-devkitm-1/partitions.bin
+            .pio/build/esp32-c3-devkitm-1/boot_app0.bin
+          if-no-files-found: error
